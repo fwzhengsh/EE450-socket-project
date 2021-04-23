@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
     }
 
     char *msg = new char[256];
-    strcat(msg, cl);
+    strcpy(msg, cl);
     int len = strlen(msg);
 
     int bytes = send(socket_tcp, msg, len, 0);

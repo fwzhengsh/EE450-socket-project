@@ -210,15 +210,15 @@ int main(int argc, char *argv[]) {
                 // receives client location through UDP
                 char *client_location = strtok(NULL, "");
                 int cl = atoi(client_location);
-                cout << "Hospital A has received input from client at location " << client_location << ".\n";
+                cout << "Hospital A has received input from client at location " << cl << ".\n";
 
                 char *response = new char[256];
 
                 if (locations.count(cl) == 0) {
                     // if location not found
                     // return error message phase 3e
-                    cout << "Hospital A does not have the location " << client_location << " in map.\n";
-                    strcat(response, "3e;A;None;None；");
+                    cout << "Hospital A does not have the location " << cl << " in map.\n";
+                    strcpy(response, "3e;A;None;None;");
                     sendMessage(response, SCHEDULER_PORT);
                     cout << "Hospital A has sent \"location not found\" to the Scheduler.\n";
                 } else {
