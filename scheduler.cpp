@@ -2,6 +2,7 @@
 #include <list>
 #include <set>
 #include <map>
+#include <cstring>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
