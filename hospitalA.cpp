@@ -139,11 +139,12 @@ void sendMessage(char* msg, const char *port) {
     int socket_scheduler = socket(udp_servinfo->ai_family, udp_servinfo->ai_socktype, udp_servinfo->ai_protocol);
     int msg_len = strlen(msg);
 
-    int send_init;
-    if ((send_init = sendto(socket_scheduler, msg, msg_len, 0, udp_servinfo->ai_addr, udp_servinfo->ai_addrlen)) == -1) {
+    int send_bytes;
+    if ((send_bytes = sendto(socket_scheduler, msg, msg_len, 0, udp_servinfo->ai_addr, udp_servinfo->ai_addrlen)) == -1) {
         cout << "send error" << endl;
         exit(1);
     }
+    // cout << "send bytes: " << send_bytes << endl;
 
     freeaddrinfo(udp_servinfo);
 
@@ -175,6 +176,15 @@ int main(int argc, char *argv[]) {
     cout << "Hospital A is up and running using UDP on port " << UDP_PORT << ".\n";
     cout << "Hospital A has total capacity " << capacity << " and initial occupancy " << occupancy << ".\n";
 
+    // send initilization information to scheduler through UDP
+    // create initial message
+    char *msg = new char[256];
+    strcpy(msg, "A;");
+    strcat(msg, argv[2]);
+    strcat(msg, ";");
+    strcat(msg, argv[3]);
+    sendMessage(msg, SCHEDULER_PORT);
+
     // read map
     map<int, map<int, double> > graph;
     set<int> locations;
@@ -196,17 +206,6 @@ int main(int argc, char *argv[]) {
         int phase = atoi(strtok(buf, ";"));
         // cout << "phase: " << phase << endl;
         switch (phase) {
-            case 1: {
-                // send initilization information to scheduler through UDP
-                // create initial message
-                char *msg = new char[256];
-                strcat(msg, "A;");
-                strcat(msg, argv[2]);
-                strcat(msg, ";");
-                strcat(msg, argv[3]);
-                sendMessage(msg, SCHEDULER_PORT);
-                break;
-            }
             case 2: {
                 // receives client location through UDP
                 char *client_location = strtok(NULL, "");
@@ -229,18 +228,18 @@ int main(int argc, char *argv[]) {
                     char *s_char = new char[20];
 
                     if (distance == 0) {
-                        strcat(d_char, "None");
-                        strcat(s_char, "None");
+                        strcpy(d_char, "None");
+                        strcpy(s_char, "None");
                     } else {
-                        strcat(d_char, to_string(distance).c_str());
+                        strcpy(d_char, to_string(distance).c_str());
                         double score = calculateScore(distance, availability);
-                        strcat(s_char, to_string(score).c_str());
+                        strcpy(s_char, to_string(score).c_str());
                     }
 
                     cout << "Hospital A has found the shortest path to client, distance = " << d_char << ".\n";
                     cout << "Hospital A has the score = " << s_char << ".\n";
 
-                    strcat(response, "3;A;");
+                    strcpy(response, "3;A;");
                     strcat(response, d_char);
                     strcat(response, ";");
                     strcat(response, s_char);

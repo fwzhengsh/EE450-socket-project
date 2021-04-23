@@ -117,7 +117,6 @@ int main() {
 	int udp_status_recv;
 	struct addrinfo udp_hint_recv;
 	struct addrinfo *udp_servinfo_recv;
-	struct sockaddr_storage sender_addr;
 
 	memset(&udp_hint_recv, 0, sizeof udp_hint_recv);
 	udp_hint_recv.ai_family = AF_UNSPEC;
@@ -132,6 +131,7 @@ int main() {
 	bind(socket_udp_recv, udp_servinfo_recv->ai_addr, udp_servinfo_recv->ai_addrlen);
 	freeaddrinfo(udp_servinfo_recv);
 
+	struct sockaddr_storage sender_addr;
 	socklen_t addr_len = sizeof sender_addr;
 	int numbytes;
 
@@ -145,6 +145,7 @@ int main() {
 	sendMessage(initial_msg, 'C', 1);
 
 	while (availability_map.size() < HOSPITAL_NUM) {
+		// cout << "size: " << availability_map.size() << endl;
 		char *buf = new char[256];
 		numbytes = recvfrom(socket_udp_recv, buf, 255, 0, (struct sockaddr *)&sender_addr, &addr_len);
 		if (numbytes == -1) {
