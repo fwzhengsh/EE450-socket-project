@@ -15,6 +15,7 @@ int main(int argc, char *argv[]) {
 	char *cl = argv[1];
 
 	// tcp socket for scheduler
+    // code from beej's tutorial
 	int status_tcp;
     struct addrinfo tcp_hint;
     struct addrinfo *tcp_servinfo;
@@ -52,6 +53,7 @@ int main(int argc, char *argv[]) {
 
 	cout << "The client has sent query to Scheduler using TCP: client location " << cl << ".\n";
 
+    // parse results and error messages
 	char *buf = new char[256];
 	int recv_bytes = recv(socket_tcp, buf, 255, 0);
 	char *assign = strtok(buf, ";");

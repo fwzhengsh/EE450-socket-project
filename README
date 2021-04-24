@@ -1,0 +1,39 @@
+Name: Feiwen Zheng
+Student ID: 7850316591
+-------------------------
+What you have done in the assignment:
+
+In this assignment, I learned about socket programming from beej's tutorial and was able to let programs communicate with each other according to 
+requirements using UDP and TCP sockets. I've also written functions that read local files and calculate shortest distance between two nodes using Dijkstra's 
+algorithm. I've also designed some rules for message parsing such that programs will act according to different situations instead of hard coding the 
+sequence of all actions.
+-------------------------
+Code Files:
+1. scheduler.cpp
+	The scheduler file first set up a UDP socket that listens to initialization messages from hospitals. After receiving all messages from three hospitals, the 
+	scheduler stores availability information locally in a map and set up a TCP socket that keep listening to client's query. Once a query is received, it checks 
+	the availability of hospitals and sends the query to avilable hospitals through UDP. Then the scheduler will wait for all results from hospitals it contacted 
+	and parse the message. If there is a legal assignment, the scheduler will first notify the client through TCP, and then notify the assigned hospital through 
+	UDP. Both the scheduler and the assigned hospital will update the occupancy information. If there is no legal assignment, the scheduler will sedn error message 
+	to the client based on given rules.
+
+2. hospitalA/B/C.cpp
+	The hospital first reads information from command line. It then sets up UDP socket and send an initial message to the scheduler. Then the hospital will read the 
+	provided local file and store and graph in a map. Then it will keep waiting for queries from the hospital unitl manually stopped. When a query is received, it will 
+	calculate the shortest distance between itself and the received location and return the score calculated using given rules. If the location is not in the map, the 
+	hospital will return error messages. Finally, if it receives assignment from the scheduler (parsed according to the phase), it will update its occupanccy.
+
+3. client.cpp
+	The client's logic is really simple. It reads its location from command line, sets up TCP socket, send message to the scheduler, wait for a reply, parses the message 
+	and the program will be closed. The client parses the error message according to some special terms return from scheduler.
+-------------------------
+The format of all the messages exchanged:
+
+The messages are all strings with information seperated by ";". The messages sent by the hospitals all contain the name of hospital, such as 'A', 'B', etc. Some messages also 
+contains a phase, such as "2" and "3e" at the beginning. Phases are mainly used for programs to parse the information and print out messages accordingly. For example, in the 
+final phase when scheduler send assignment back to the client, "NF" represents location not found and "SCR" represents score equals to 0. 
+-------------------------
+Reused Code:
+
+The set up of TCP and UDP sockets in various files and the send message function in the hospital files reused code from beej's tutorial. Please see comment for details.
+-------------------------

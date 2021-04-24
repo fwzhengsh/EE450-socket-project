@@ -18,6 +18,7 @@
 
 using namespace std;
 
+// data stucture for min heap elements
 struct Pair {
     int index;
     double distance;
@@ -29,6 +30,7 @@ struct Pair {
     }
 };
 
+// min heap comparison
 class MinHeapComp {
 public:
     MinHeapComp() {}
@@ -37,6 +39,7 @@ public:
     }
 };
 
+// construct map of graph
 void readMap(map<int, map<int, double> > &graph, set<int> &locations) {
     string line;
     ifstream inf ("map.txt");
@@ -73,6 +76,7 @@ void readMap(map<int, map<int, double> > &graph, set<int> &locations) {
     return;
 }
 
+// dijkstra's alhorithm
 double findPath(map<int, map<int, double> > &graph, int start, int end) {
     // list<int> res;
     priority_queue<Pair, vector<Pair>, MinHeapComp> pq;
@@ -125,6 +129,8 @@ double calculateScore(double d, double a) {
     return 1 / (d * (1.1 - a));
 }
 
+// function for sending messages through UDP
+// beej's tutorial
 void sendMessage(char* msg, const char *port) {
     int status;
     struct addrinfo udp_hint;
@@ -160,6 +166,7 @@ int main(int argc, char *argv[]) {
     double availability = (double)(capacity - occupancy) / capacity;
 
     // set up UDP socket (receiver)
+    // code from beej's tutorial
     int status_recv;
     struct addrinfo udp_hint_recv;
     struct addrinfo *udp_servinfo_recv;
@@ -250,6 +257,7 @@ int main(int argc, char *argv[]) {
                 break;
             }
             case 4:
+                // receives assignment from scheduler
                 occupancy += 1;
                 availability = (double)(capacity - occupancy) / capacity;
                 cout << "Hospital A has been assigned to a client, occupation is updated to " << occupancy 

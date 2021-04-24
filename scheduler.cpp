@@ -19,6 +19,7 @@
 
 using namespace std;
 
+// data structure to store results returned from hospitals in list and for comparison
 struct Pair {
 	char name;
 	double distance;
@@ -30,6 +31,7 @@ struct Pair {
 	}
 };
 
+// function for sending messages through UDP
 void sendMessage(char *msg, char name, int phase) {
 	char *port = new char[100];
 	switch (name) {
@@ -65,6 +67,7 @@ void sendMessage(char *msg, char name, int phase) {
         exit(1);
     }
 
+    // print based on phase
     switch (phase) {
     	case 2:
     		cout << "The Scheduler has sent client location to Hospital " << name << " using UDP over port " << port << endl;
@@ -79,6 +82,7 @@ void sendMessage(char *msg, char name, int phase) {
     close(socket_hospital_send);
 }
 
+// check availabilities of all hospitals and send queries to available ones
 int countAvailableHos(map<char, int> m, char *buf) {
 	int count = 0;
 	char *port;
@@ -93,6 +97,7 @@ int countAvailableHos(map<char, int> m, char *buf) {
 	return count;
 }
 
+// comparison function to make assignemnts
 char* decide(list<Pair> l) {
 	char *res = new char[1];
 	double max_score = -1;
@@ -114,6 +119,8 @@ char* decide(list<Pair> l) {
 int main() {
 	cout << "The Scheduler is up and running." << endl;
 
+	// set up UDP to listen to hospitals
+	// code from beej's tutorial
 	int udp_status_recv;
 	struct addrinfo udp_hint_recv;
 	struct addrinfo *udp_servinfo_recv;
@@ -144,6 +151,7 @@ int main() {
 	sendMessage(initial_msg, 'B', 1);
 	sendMessage(initial_msg, 'C', 1);
 
+	// keep receiving until all hospitals finishes initialization
 	while (availability_map.size() < HOSPITAL_NUM) {
 		// cout << "size: " << availability_map.size() << endl;
 		char *buf = new char[256];
@@ -172,6 +180,7 @@ int main() {
 	// cout << "initialization finished" << availability_map.size() << endl;
 
 	// set up TCP with client
+	// code from beej's tutorial
 	int status_tcp;
     struct addrinfo tcp_hint;
     struct addrinfo *tcp_servinfo;
@@ -210,6 +219,7 @@ int main() {
     	illegal = false;
     	not_found = false;
 
+    	// wait for response from hospitals
     	while (query_set.size() < available_count) {
     		char *response = new char[256];
 			numbytes = recvfrom(socket_udp_recv, response, 255, 0, (struct sockaddr *)&sender_addr, &addr_len);
@@ -221,6 +231,7 @@ int main() {
 			cout << "The Scheduler has received map information from Hospital " << n << " , the score = " << s 
 			<< " and the distance = " << d << ".\n";
 
+			// deal with location not found and score = none
 			if (strcmp(phase, "3e") == 0) {
 				illegal = true;
 				not_found = true;
@@ -234,7 +245,7 @@ int main() {
     	}
 
     	char *reply = new char[256];
-    	// if !illegal, compare and pick
+    	// error message if needed
 		if (illegal) {
 			strcat(reply, "None;");
 			if (not_found) {
@@ -249,9 +260,11 @@ int main() {
 		}
 
 		// cout << "reply: " << reply << endl;
+		// send result back to client
     	send(new_fd, reply, strlen(reply), 0);
     	cout << "The Scheduler has sent the result to client using TCP over port " << PORT_TCP << ".\n";
 
+    	// if assignment made, notify hospital
     	char *assigned_hospital = strtok(reply, ";");
     	if (strcmp(assigned_hospital, "None") != 0) {
     		char *msg = new char[256];
